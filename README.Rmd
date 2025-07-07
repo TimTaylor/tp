@@ -1,0 +1,85 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# tp
+
+**Experimental, demo package**
+
+Small wrapper package, primarily to demonstrate creation of tornado plots.
+
+## Installation
+
+You can install the development version of tp from R-Universe via:
+
+```{r}
+
+install.packages('tp', repos = c('https://timtaylor.r-universe.dev', 'https://cloud.r-project.org'))
+```
+
+
+## How to use
+
+tp provides two main functions: `tornado_samples()` and `tornado_plot()`.
+
+The first of these, `tornado_samples()` takes:
+
+- A user-supplied, vectorised, input function;
+- A set of distributions you wish to draw from that have a one-to-one matching
+  to the aforementioned function's parameters. These must be from the 
+  [distributions3](https://alexpghayes.github.io/distributions3/) package.
+- A number of samples to draw for each parameter.
+
+The function is just a small wrapper around lapply that loops over a functions
+parameters, sampling one whilst fixing the others. In effect it just wraps a 
+simple univariate sensitivity analysis, ensuring the output is formatted in a
+usable way for the later plot function. The output is a tibble with class
+**tornado_samples** and an additional attributes that gives the baseline value
+calculated when setting each argument to it's distributions mean value.
+
+
+```{r}
+library(tp)
+set.seed(1)
+
+# Function with desired arguments
+# NOTE: MUST be vectorised by the user and return a scalar value
+fun <- function(cost_per_day, days, discount) cost_per_day * days * discount
+
+# A distribution (from distributions3) for each function argument
+distributions <- list(
+    cost_per_day = distributions3::Gamma(shape = 9, rate = 0.5),
+    days         = distributions3::Gamma(shape = 5, rate = 1),
+    discount     = distributions3::Beta(alpha = 2, beta = 40)
+)
+
+# Number of samples to take for each argument
+samples <- 1000
+
+# generate the samples for each parameter
+(dat <- tornado_sample(samples, fun, distributions))
+```
+
+`tornado_plot()` takes, as input, the output from `tornado_sample()` as well
+as a character string specifying the type of tornado plot to create (**jitter**
+or **maxmin**). The first of these simply plots the sample results against the
+corresponding distribution that varies. The second options plots the
+corresponding maximum and minimum values as a split bar chart.
+
+```{r}
+tornado_plot(dat)
+tornado_plot(dat, type = "maxmin")
+```
+
+
