@@ -45,13 +45,16 @@ set.seed(1)
 
 # Function with desired arguments
 # NOTE: MUST be vectorised by the user and return a scalar value
-fun <- function(cost_per_day, days, discount) cost_per_day * days * discount
+fun <- function(cost_per_day, days, discount, guff) {
+    10 * cost_per_day * days * discount - guff
+}
 
 # A distribution (from distributions3) for each function argument
 distributions <- list(
     cost_per_day = distributions3::Gamma(shape = 9, rate = 0.5),
     days         = distributions3::Gamma(shape = 5, rate = 1),
-    discount     = distributions3::Beta(alpha = 2, beta = 40)
+    discount     = distributions3::Beta(alpha = 2, beta = 40),
+    guff        = distributions3::Gamma(shape = 8, rate = 0.5)
 )
 
 # Number of samples to take for each argument
@@ -60,55 +63,73 @@ samples <- 1000
 # generate the samples for each parameter
 (dat <- tornado_sample(samples, fun, distributions))
 #> $cost_per_day
-#> # A tibble: 1,000 × 4
-#>    cost_per_day  days discount .result
-#>           <dbl> <dbl>    <dbl>   <dbl>
-#>  1        13.5      5   0.0476    3.22
-#>  2        25.6      5   0.0476    6.10
-#>  3        25.2      5   0.0476    6.01
-#>  4        19.5      5   0.0476    4.64
-#>  5         9.21     5   0.0476    2.19
-#>  6        20.0      5   0.0476    4.75
-#>  7        21.6      5   0.0476    5.14
-#>  8        20.5      5   0.0476    4.89
-#>  9        15.3      5   0.0476    3.63
-#> 10        12.7      5   0.0476    3.01
+#> # A tibble: 1,000 × 5
+#>    cost_per_day  days discount  guff .result
+#>           <dbl> <dbl>    <dbl> <dbl>   <dbl>
+#>  1        13.5      5   0.0476    16   16.2 
+#>  2        25.6      5   0.0476    16   45.0 
+#>  3        25.2      5   0.0476    16   44.1 
+#>  4        19.5      5   0.0476    16   30.4 
+#>  5         9.21     5   0.0476    16    5.92
+#>  6        20.0      5   0.0476    16   31.5 
+#>  7        21.6      5   0.0476    16   35.4 
+#>  8        20.5      5   0.0476    16   32.9 
+#>  9        15.3      5   0.0476    16   20.3 
+#> 10        12.7      5   0.0476    16   14.1 
 #> # ℹ 990 more rows
 #> 
 #> $days
-#> # A tibble: 1,000 × 4
-#>    cost_per_day  days discount .result
-#>           <dbl> <dbl>    <dbl>   <dbl>
-#>  1           18  7.73   0.0476    6.62
-#>  2           18  2.69   0.0476    2.31
-#>  3           18  4.65   0.0476    3.99
-#>  4           18  2.56   0.0476    2.20
-#>  5           18  2.76   0.0476    2.36
-#>  6           18  2.19   0.0476    1.87
-#>  7           18  5.84   0.0476    5.01
-#>  8           18  3.45   0.0476    2.96
-#>  9           18  8.31   0.0476    7.12
-#> 10           18  4.47   0.0476    3.83
+#> # A tibble: 1,000 × 5
+#>    cost_per_day  days discount  guff .result
+#>           <dbl> <dbl>    <dbl> <dbl>   <dbl>
+#>  1           18  7.73   0.0476    16   50.2 
+#>  2           18  2.69   0.0476    16    7.09
+#>  3           18  4.65   0.0476    16   23.9 
+#>  4           18  2.56   0.0476    16    5.97
+#>  5           18  2.76   0.0476    16    7.62
+#>  6           18  2.19   0.0476    16    2.74
+#>  7           18  5.84   0.0476    16   34.1 
+#>  8           18  3.45   0.0476    16   13.6 
+#>  9           18  8.31   0.0476    16   55.2 
+#> 10           18  4.47   0.0476    16   22.3 
 #> # ℹ 990 more rows
 #> 
 #> $discount
-#> # A tibble: 1,000 × 4
-#>    cost_per_day  days discount .result
-#>           <dbl> <dbl>    <dbl>   <dbl>
-#>  1           18     5   0.0493   4.43 
-#>  2           18     5   0.0541   4.87 
-#>  3           18     5   0.0434   3.90 
-#>  4           18     5   0.0177   1.60 
-#>  5           18     5   0.0109   0.977
-#>  6           18     5   0.0551   4.96 
-#>  7           18     5   0.0179   1.61 
-#>  8           18     5   0.0711   6.40 
-#>  9           18     5   0.0840   7.56 
-#> 10           18     5   0.0531   4.77 
+#> # A tibble: 1,000 × 5
+#>    cost_per_day  days discount  guff .result
+#>           <dbl> <dbl>    <dbl> <dbl>   <dbl>
+#>  1           18     5   0.0493    16 28.3   
+#>  2           18     5   0.0541    16 32.7   
+#>  3           18     5   0.0434    16 23.0   
+#>  4           18     5   0.0177    16 -0.0422
+#>  5           18     5   0.0109    16 -6.23  
+#>  6           18     5   0.0551    16 33.6   
+#>  7           18     5   0.0179    16  0.0704
+#>  8           18     5   0.0711    16 48.0   
+#>  9           18     5   0.0840    16 59.6   
+#> 10           18     5   0.0531    16 31.7   
+#> # ℹ 990 more rows
+#> 
+#> $guff
+#> # A tibble: 1,000 × 5
+#>    cost_per_day  days discount  guff .result
+#>           <dbl> <dbl>    <dbl> <dbl>   <dbl>
+#>  1           18     5   0.0476  9.21    33.6
+#>  2           18     5   0.0476 20.1     22.8
+#>  3           18     5   0.0476 16.9     26.0
+#>  4           18     5   0.0476 21.6     21.3
+#>  5           18     5   0.0476 18.5     24.4
+#>  6           18     5   0.0476 17.8     25.0
+#>  7           18     5   0.0476 12.6     30.3
+#>  8           18     5   0.0476 13.6     29.2
+#>  9           18     5   0.0476 10.8     32.0
+#> 10           18     5   0.0476 11.2     31.7
 #> # ℹ 990 more rows
 #> 
 #> attr(,"baseline")
-#> [1] 4.285714
+#> [1] 26.85714
+#> attr(,"output_name")
+#> [1] ".result"
 #> attr(,"class")
 #> [1] "tornado_samples"
 ```

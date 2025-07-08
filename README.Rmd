@@ -53,13 +53,16 @@ set.seed(1)
 
 # Function with desired arguments
 # NOTE: MUST be vectorised by the user and return a scalar value
-fun <- function(cost_per_day, days, discount) cost_per_day * days * discount
+fun <- function(cost_per_day, days, discount, guff) {
+    10 * cost_per_day * days * discount - guff
+}
 
 # A distribution (from distributions3) for each function argument
 distributions <- list(
     cost_per_day = distributions3::Gamma(shape = 9, rate = 0.5),
     days         = distributions3::Gamma(shape = 5, rate = 1),
-    discount     = distributions3::Beta(alpha = 2, beta = 40)
+    discount     = distributions3::Beta(alpha = 2, beta = 40),
+    guff        = distributions3::Gamma(shape = 8, rate = 0.5)
 )
 
 # Number of samples to take for each argument

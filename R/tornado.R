@@ -104,6 +104,7 @@ tornado_sample <- function(n, fun, distributions, ..., baseline = NULL, output_n
         varying <- list(.varying = distnms[[i]])
         X <- distributions[[i]]
         random_inputs <- distributions3::random(X, n)
+        col <- ifelse (random_inputs < means[[i]], "less", "more")
         inputs[[i]] <- random_inputs
         results <- do.call(fun, inputs)
         if (length(results) != length(random_inputs)) {
@@ -111,13 +112,16 @@ tornado_sample <- function(n, fun, distributions, ..., baseline = NULL, output_n
         }
         out <- c(inputs, list(do.call(fun, inputs)))
         names(out)[length(out)] <- output_name
-        tibble::as_tibble(out)
+        out <- tibble::as_tibble(out)
+        attr(out, "col") <- col
+        out
     })
     names(sample_outputs) <- distnms
 
     structure(
         sample_outputs,
         baseline = baseline,
+        output_name = output_name,
         class = "tornado_samples"
     )
 }
@@ -153,18 +157,24 @@ tornado_plot <- function(x, ..., type = c("jitter", "maxmin"), nbreaks = 6, xlab
     baseline <- attr(x, "baseline")
     negative <- dat$.result < baseline
     names <- rep(names(x), times = vapply(x, nrow, 1L))
+    cols <- unlist(lapply(x, attr, "col"), use.names = FALSE)
+    result_column <- attr(x, "output_name")
+    result <- dat[[result_column]]
 
     # calculate rough plot limits
-    lower <- max(dat[negative, ".result", drop = TRUE])
-    lower <- -ceiling(lower * 1.2)
-    upper <- max(dat[!negative, ".result", drop = TRUE])
-    upper <- ceiling(upper * 1.2)
+    spread <- max(result) - min(result)
+    lower <- min(result) - spread / 10
+    upper <- max(result) + spread / 10
 
-    dat <- data.frame(value = dat$.result, varying = names, negative = negative)
+    dat <- data.frame(value = dat$.result, varying = names, colour = cols)
+    # calculate the order
+    ord <- aggregate(value ~ varying, data = dat, FUN = \(x) max(x) - min(x))
+    ord <- ord$varying[order(ord$value)]
+    dat$varying <- factor(dat$varying, levels = ord)
 
     if (type == "jitter") {
         breaks <- scales::breaks_extended(n = nbreaks)(c(lower, upper))
-        ggplot2::ggplot(dat, ggplot2::aes(.data$value, .data$varying, col = .data$negative)) +
+        ggplot2::ggplot(dat, ggplot2::aes(.data$value, .data$varying, col = .data$colour)) +
             ggplot2::geom_jitter() +
             ggplot2::theme_minimal() +
             ggplot2::theme(
@@ -174,18 +184,19 @@ tornado_plot <- function(x, ..., type = c("jitter", "maxmin"), nbreaks = 6, xlab
             ggplot2::xlab(xlab) +
             ggplot2::geom_vline(xintercept = baseline, linetype = "dashed") +
             ggplot2::coord_cartesian(xlim = c(lower, upper)) +
-            ggplot2::scale_x_continuous(breaks = breaks, labels = breaks)
+            ggplot2::scale_x_continuous(breaks = breaks, labels = breaks) +
+            ggplot2::scale_colour_manual(values = c("lightskyblue", "indianred"))
     } else {
 
         dat$plot_value <- dat$value - baseline
         dat <- stats::aggregate(
-            plot_value ~ varying + negative,
+            plot_value ~ varying + colour,
             data = dat,
             FUN = function(x) if (x[1L] < 0) min(x) else (max(x))
         )
         breaks <- scales::breaks_extended(n = nbreaks)(c(lower, upper)) - baseline
         labels <- breaks + baseline
-        ggplot2::ggplot(dat, ggplot2::aes(.data$plot_value, .data$varying, fill = .data$negative)) +
+        ggplot2::ggplot(dat, ggplot2::aes(.data$plot_value, .data$varying, fill = .data$colour)) +
             ggplot2::geom_col() +
             ggplot2::theme_minimal() +
             ggplot2::theme(
@@ -198,7 +209,8 @@ tornado_plot <- function(x, ..., type = c("jitter", "maxmin"), nbreaks = 6, xlab
             ggplot2::scale_x_continuous(
                 breaks = breaks,
                 labels = labels
-            )
+            ) +
+            ggplot2::scale_fill_manual(values = c("lightskyblue", "indianred"))
 
     }
 }
