@@ -13,7 +13,6 @@ plots.
 You can install the development version of tp from R-Universe via:
 
 ``` r
-
 install.packages('tp', repos = c('https://timtaylor.r-universe.dev', 'https://cloud.r-project.org'))
 ```
 

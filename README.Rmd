@@ -23,7 +23,6 @@ Small wrapper package, primarily to demonstrate creation of tornado plots.
 You can install the development version of tp from R-Universe via:
 
 ```{r, eval=FALSE}
-
 install.packages('tp', repos = c('https://timtaylor.r-universe.dev', 'https://cloud.r-project.org'))
 ```
 
