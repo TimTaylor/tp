@@ -15,13 +15,6 @@ You can install the development version of tp from R-Universe via:
 ``` r
 
 install.packages('tp', repos = c('https://timtaylor.r-universe.dev', 'https://cloud.r-project.org'))
-#> Installing package into '/tmp/RtmpudCKzO/temp_libpath49df68a48e89'
-#> (as 'lib' is unspecified)
-#> Warning: package 'tp' is not available for this version of R
-#> 
-#> A version of this package for your version of R might be available elsewhere,
-#> see the ideas at
-#> https://cran.r-project.org/doc/manuals/r-patched/R-admin.html#Installing-packages
 ```
 
 ## How to use
@@ -132,10 +125,10 @@ bar chart.
 tornado_plot(dat)
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
+![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
 
 ``` r
 tornado_plot(dat, type = "maxmin")
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-2.png" width="100%" />
+![](man/figures/README-unnamed-chunk-4-2.png)<!-- -->
