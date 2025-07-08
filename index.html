@@ -73,13 +73,16 @@
 <span></span>
 <span><span class="co"># Function with desired arguments</span></span>
 <span><span class="co"># NOTE: MUST be vectorised by the user and return a scalar value</span></span>
-<span><span class="va">fun</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">cost_per_day</span>, <span class="va">days</span>, <span class="va">discount</span><span class="op">)</span> <span class="va">cost_per_day</span> <span class="op">*</span> <span class="va">days</span> <span class="op">*</span> <span class="va">discount</span></span>
+<span><span class="va">fun</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">cost_per_day</span>, <span class="va">days</span>, <span class="va">discount</span>, <span class="va">guff</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fl">10</span> <span class="op">*</span> <span class="va">cost_per_day</span> <span class="op">*</span> <span class="va">days</span> <span class="op">*</span> <span class="va">discount</span> <span class="op">-</span> <span class="va">guff</span></span>
+<span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># A distribution (from distributions3) for each function argument</span></span>
 <span><span class="va">distributions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    cost_per_day <span class="op">=</span> <span class="fu">distributions3</span><span class="fu">::</span><span class="fu">Gamma</span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">9</span>, rate <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>,</span>
 <span>    days         <span class="op">=</span> <span class="fu">distributions3</span><span class="fu">::</span><span class="fu">Gamma</span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">5</span>, rate <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span>
-<span>    discount     <span class="op">=</span> <span class="fu">distributions3</span><span class="fu">::</span><span class="fu"><a href="https://alexpghayes.github.io/distributions3/reference/Beta.html" class="external-link">Beta</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">2</span>, beta <span class="op">=</span> <span class="fl">40</span><span class="op">)</span></span>
+<span>    discount     <span class="op">=</span> <span class="fu">distributions3</span><span class="fu">::</span><span class="fu"><a href="https://alexpghayes.github.io/distributions3/reference/Beta.html" class="external-link">Beta</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">2</span>, beta <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>,</span>
+<span>    guff        <span class="op">=</span> <span class="fu">distributions3</span><span class="fu">::</span><span class="fu">Gamma</span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">8</span>, rate <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Number of samples to take for each argument</span></span>
@@ -88,55 +91,73 @@
 <span><span class="co"># generate the samples for each parameter</span></span>
 <span><span class="op">(</span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tornado.html">tornado_sample</a></span><span class="op">(</span><span class="va">samples</span>, <span class="va">fun</span>, <span class="va">distributions</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $cost_per_day</span></span>
-<span><span class="co">#&gt; # A tibble: 1,000 × 4</span></span>
-<span><span class="co">#&gt;    cost_per_day  days discount .result</span></span>
-<span><span class="co">#&gt;           &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1        13.5      5   0.0476    3.22</span></span>
-<span><span class="co">#&gt;  2        25.6      5   0.0476    6.10</span></span>
-<span><span class="co">#&gt;  3        25.2      5   0.0476    6.01</span></span>
-<span><span class="co">#&gt;  4        19.5      5   0.0476    4.64</span></span>
-<span><span class="co">#&gt;  5         9.21     5   0.0476    2.19</span></span>
-<span><span class="co">#&gt;  6        20.0      5   0.0476    4.75</span></span>
-<span><span class="co">#&gt;  7        21.6      5   0.0476    5.14</span></span>
-<span><span class="co">#&gt;  8        20.5      5   0.0476    4.89</span></span>
-<span><span class="co">#&gt;  9        15.3      5   0.0476    3.63</span></span>
-<span><span class="co">#&gt; 10        12.7      5   0.0476    3.01</span></span>
+<span><span class="co">#&gt; # A tibble: 1,000 × 5</span></span>
+<span><span class="co">#&gt;    cost_per_day  days discount  guff .result</span></span>
+<span><span class="co">#&gt;           &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1        13.5      5   0.0476    16   16.2 </span></span>
+<span><span class="co">#&gt;  2        25.6      5   0.0476    16   45.0 </span></span>
+<span><span class="co">#&gt;  3        25.2      5   0.0476    16   44.1 </span></span>
+<span><span class="co">#&gt;  4        19.5      5   0.0476    16   30.4 </span></span>
+<span><span class="co">#&gt;  5         9.21     5   0.0476    16    5.92</span></span>
+<span><span class="co">#&gt;  6        20.0      5   0.0476    16   31.5 </span></span>
+<span><span class="co">#&gt;  7        21.6      5   0.0476    16   35.4 </span></span>
+<span><span class="co">#&gt;  8        20.5      5   0.0476    16   32.9 </span></span>
+<span><span class="co">#&gt;  9        15.3      5   0.0476    16   20.3 </span></span>
+<span><span class="co">#&gt; 10        12.7      5   0.0476    16   14.1 </span></span>
 <span><span class="co">#&gt; # ℹ 990 more rows</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $days</span></span>
-<span><span class="co">#&gt; # A tibble: 1,000 × 4</span></span>
-<span><span class="co">#&gt;    cost_per_day  days discount .result</span></span>
-<span><span class="co">#&gt;           &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1           18  7.73   0.0476    6.62</span></span>
-<span><span class="co">#&gt;  2           18  2.69   0.0476    2.31</span></span>
-<span><span class="co">#&gt;  3           18  4.65   0.0476    3.99</span></span>
-<span><span class="co">#&gt;  4           18  2.56   0.0476    2.20</span></span>
-<span><span class="co">#&gt;  5           18  2.76   0.0476    2.36</span></span>
-<span><span class="co">#&gt;  6           18  2.19   0.0476    1.87</span></span>
-<span><span class="co">#&gt;  7           18  5.84   0.0476    5.01</span></span>
-<span><span class="co">#&gt;  8           18  3.45   0.0476    2.96</span></span>
-<span><span class="co">#&gt;  9           18  8.31   0.0476    7.12</span></span>
-<span><span class="co">#&gt; 10           18  4.47   0.0476    3.83</span></span>
+<span><span class="co">#&gt; # A tibble: 1,000 × 5</span></span>
+<span><span class="co">#&gt;    cost_per_day  days discount  guff .result</span></span>
+<span><span class="co">#&gt;           &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1           18  7.73   0.0476    16   50.2 </span></span>
+<span><span class="co">#&gt;  2           18  2.69   0.0476    16    7.09</span></span>
+<span><span class="co">#&gt;  3           18  4.65   0.0476    16   23.9 </span></span>
+<span><span class="co">#&gt;  4           18  2.56   0.0476    16    5.97</span></span>
+<span><span class="co">#&gt;  5           18  2.76   0.0476    16    7.62</span></span>
+<span><span class="co">#&gt;  6           18  2.19   0.0476    16    2.74</span></span>
+<span><span class="co">#&gt;  7           18  5.84   0.0476    16   34.1 </span></span>
+<span><span class="co">#&gt;  8           18  3.45   0.0476    16   13.6 </span></span>
+<span><span class="co">#&gt;  9           18  8.31   0.0476    16   55.2 </span></span>
+<span><span class="co">#&gt; 10           18  4.47   0.0476    16   22.3 </span></span>
 <span><span class="co">#&gt; # ℹ 990 more rows</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $discount</span></span>
-<span><span class="co">#&gt; # A tibble: 1,000 × 4</span></span>
-<span><span class="co">#&gt;    cost_per_day  days discount .result</span></span>
-<span><span class="co">#&gt;           &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1           18     5   0.0493   4.43 </span></span>
-<span><span class="co">#&gt;  2           18     5   0.0541   4.87 </span></span>
-<span><span class="co">#&gt;  3           18     5   0.0434   3.90 </span></span>
-<span><span class="co">#&gt;  4           18     5   0.0177   1.60 </span></span>
-<span><span class="co">#&gt;  5           18     5   0.0109   0.977</span></span>
-<span><span class="co">#&gt;  6           18     5   0.0551   4.96 </span></span>
-<span><span class="co">#&gt;  7           18     5   0.0179   1.61 </span></span>
-<span><span class="co">#&gt;  8           18     5   0.0711   6.40 </span></span>
-<span><span class="co">#&gt;  9           18     5   0.0840   7.56 </span></span>
-<span><span class="co">#&gt; 10           18     5   0.0531   4.77 </span></span>
+<span><span class="co">#&gt; # A tibble: 1,000 × 5</span></span>
+<span><span class="co">#&gt;    cost_per_day  days discount  guff .result</span></span>
+<span><span class="co">#&gt;           &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1           18     5   0.0493    16 28.3   </span></span>
+<span><span class="co">#&gt;  2           18     5   0.0541    16 32.7   </span></span>
+<span><span class="co">#&gt;  3           18     5   0.0434    16 23.0   </span></span>
+<span><span class="co">#&gt;  4           18     5   0.0177    16 -0.0422</span></span>
+<span><span class="co">#&gt;  5           18     5   0.0109    16 -6.23  </span></span>
+<span><span class="co">#&gt;  6           18     5   0.0551    16 33.6   </span></span>
+<span><span class="co">#&gt;  7           18     5   0.0179    16  0.0704</span></span>
+<span><span class="co">#&gt;  8           18     5   0.0711    16 48.0   </span></span>
+<span><span class="co">#&gt;  9           18     5   0.0840    16 59.6   </span></span>
+<span><span class="co">#&gt; 10           18     5   0.0531    16 31.7   </span></span>
+<span><span class="co">#&gt; # ℹ 990 more rows</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $guff</span></span>
+<span><span class="co">#&gt; # A tibble: 1,000 × 5</span></span>
+<span><span class="co">#&gt;    cost_per_day  days discount  guff .result</span></span>
+<span><span class="co">#&gt;           &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1           18     5   0.0476  9.21    33.6</span></span>
+<span><span class="co">#&gt;  2           18     5   0.0476 20.1     22.8</span></span>
+<span><span class="co">#&gt;  3           18     5   0.0476 16.9     26.0</span></span>
+<span><span class="co">#&gt;  4           18     5   0.0476 21.6     21.3</span></span>
+<span><span class="co">#&gt;  5           18     5   0.0476 18.5     24.4</span></span>
+<span><span class="co">#&gt;  6           18     5   0.0476 17.8     25.0</span></span>
+<span><span class="co">#&gt;  7           18     5   0.0476 12.6     30.3</span></span>
+<span><span class="co">#&gt;  8           18     5   0.0476 13.6     29.2</span></span>
+<span><span class="co">#&gt;  9           18     5   0.0476 10.8     32.0</span></span>
+<span><span class="co">#&gt; 10           18     5   0.0476 11.2     31.7</span></span>
 <span><span class="co">#&gt; # ℹ 990 more rows</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; attr(,"baseline")</span></span>
-<span><span class="co">#&gt; [1] 4.285714</span></span>
+<span><span class="co">#&gt; [1] 26.85714</span></span>
+<span><span class="co">#&gt; attr(,"output_name")</span></span>
+<span><span class="co">#&gt; [1] ".result"</span></span>
 <span><span class="co">#&gt; attr(,"class")</span></span>
 <span><span class="co">#&gt; [1] "tornado_samples"</span></span></code></pre></div>
 <p><code><a href="reference/tornado.html">tornado_plot()</a></code> takes, as input, the output from <code><a href="reference/tornado.html">tornado_sample()</a></code> as well as a character string specifying the type of tornado plot to create (<strong>jitter</strong> or <strong>maxmin</strong>). The first of these simply plots the sample results against the corresponding distribution that varies. The second options plots the corresponding maximum and minimum values as a split bar chart.</p>
